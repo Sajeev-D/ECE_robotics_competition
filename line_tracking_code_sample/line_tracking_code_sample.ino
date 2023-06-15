@@ -53,15 +53,18 @@ void loop() {
     lightSensor.start();
     int lux = lightSensor.getLux();
 
-    //determine if light is shining on
 
+
+    // if light is shining on
     if(lux>3000){
       lightTurnedOn = 1;
     }
 
   }
 
+
   if(lightTurnedOn == 1){
+
     //black returns 1, white returns 0
     sensorValue1 = digitalRead(IR_PIN_1); //left sensor
     sensorValue2 = digitalRead(IR_PIN_2); //right sensor
@@ -81,6 +84,7 @@ void loop() {
       right();
     }
   }
+
 
 }
 
@@ -109,8 +113,8 @@ void right(){
 
   //Speed:
     //note: left goes slow, right stays still
-  LEFT_MOTOR_1->setSpeed(150);//less than 20% of max speed
-  LEFT_MOTOR_2->setSpeed(150);//less than 20% of max speed
+  LEFT_MOTOR_1->setSpeed(255);//less than 20% of max speed
+  LEFT_MOTOR_2->setSpeed(255);//less than 20% of max speed
   RIGHT_MOTOR_3->setSpeed(0);
   RIGHT_MOTOR_4->setSpeed(0);
 }
@@ -127,8 +131,8 @@ void left(){
     //note: right goes slow, left stays still
   LEFT_MOTOR_1->setSpeed(0);//less than 20% of max speed
   LEFT_MOTOR_2->setSpeed(0);//less than 20% of max speed
-  RIGHT_MOTOR_3->setSpeed(150);
-  RIGHT_MOTOR_4->setSpeed(150);
+  RIGHT_MOTOR_3->setSpeed(255);
+  RIGHT_MOTOR_4->setSpeed(255);
 }
 
 void stop(){
@@ -140,4 +144,7 @@ void stop(){
   LEFT_MOTOR_2->run(RELEASE);
   RIGHT_MOTOR_3->run(RELEASE);
   RIGHT_MOTOR_4->run(RELEASE);
+
+  //restart initialization
+  lightTurnedOn = 0;
 }
