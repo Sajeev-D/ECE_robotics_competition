@@ -58,11 +58,11 @@ void loop() {
 
 void straight(){
   //Directions:
-  LEFT_MOTOR_1->run(FORWARD);
-  LEFT_MOTOR_2->run(FORWARD);
+  LEFT_MOTOR_1->run(BACKWARD);
+  LEFT_MOTOR_2->run(BACKWARD);
     //remember, left and right motors are set up in opposite directions
-  RIGHT_MOTOR_3->run(BACKWARD);
-  RIGHT_MOTOR_4->run(BACKWARD);
+  RIGHT_MOTOR_3->run(FORWARD);
+  RIGHT_MOTOR_4->run(FORWARD);
 
   //Speed:
   LEFT_MOTOR_1->setSpeed(MAX_SPEED);
@@ -73,11 +73,11 @@ void straight(){
 
 void right(){
   //Directions:
-  LEFT_MOTOR_1->run(FORWARD);
-  LEFT_MOTOR_2->run(FORWARD);
+  LEFT_MOTOR_1->run(BACKWARD);
+  LEFT_MOTOR_2->run(BACKWARD);
     //remember, left and right motors are set up in opposite directions
-  RIGHT_MOTOR_3->run(BACKWARD);
-  RIGHT_MOTOR_4->run(BACKWARD);
+  RIGHT_MOTOR_3->run(FORWARD);
+  RIGHT_MOTOR_4->run(FORWARD);
 
   //Speed:
     //note: left goes slow, right stays still
@@ -89,11 +89,11 @@ void right(){
 
 void left(){
   //Directions:
-  LEFT_MOTOR_1->run(FORWARD);
-  LEFT_MOTOR_2->run(FORWARD);
+  LEFT_MOTOR_1->run(BACKWARD);
+  LEFT_MOTOR_2->run(BACKWARD);
     //remember, left and right motors are set up in opposite directions
-  RIGHT_MOTOR_3->run(BACKWARD);
-  RIGHT_MOTOR_4->run(BACKWARD);
+  RIGHT_MOTOR_3->run(FORWARD);
+  RIGHT_MOTOR_4->run(FORWARD);
 
   //Speed:
     //note: right goes slow, left stays still
