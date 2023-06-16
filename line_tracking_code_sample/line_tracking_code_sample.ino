@@ -56,18 +56,21 @@ void setup() {
 
 void loop() {
 
-  //light sensor (robot initialization step)
-
+  //light sensor reading 
   lightSensor.start();
   int lux = lightSensor.getLux();
 
-  // if light is shining on
+  // if light is shining on, switch. either GO or stop initiated
   if (lux > 3000) {
-    lightTurnedOn = 1;
+    if(lightTurnedOn==1){
+      lightTurnedOn = 0;
+    }else{
+      lightTurnedOn = 1;
+    }
   }
 
 
-  if (lightTurnedOn == 1) {
+  if (lightTurnedOn == 1) { //bot is good to go
 
     //black returns 1, white returns 0
     sensorValue1 = digitalRead(IR_PIN_1);  //left sensor (Outer)
@@ -76,17 +79,21 @@ void loop() {
     sensorValue4 = digitalRead(IR_PIN_4);  //right sensor (Inner)
 
     // Directions: (assume the IR sensors are on either side of the black tape)
-    if (lux > 3000) {
-      stop();
-      break;
-    } else if (sensorValue1 == 0 && sensorValue2 == 0 && sensorValue3 == 1 && sensorValue4 == 1) {
+    if (sensorValue1 == 0 && sensorValue2 == 0 && sensorValue3 == 1 && sensorValue4 == 1) {
       straight();
     } else if (sensorValue1 == 0 && sensorValue3 == 0) {  //if inner and outer of left detects white, the robot will turn right
       right();
     } else if (sensorValue2 == 0 && sensorValue4 == 0) {  // Opposite to above explanation
       left();
     }
+  }else{ //
+    stop();
   }
+}
+
+
+void following(){
+  //
 }
 
 void straight() {
