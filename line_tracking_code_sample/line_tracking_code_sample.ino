@@ -71,21 +71,7 @@ void loop() {
 
 
   if (lightTurnedOn == 1) { //bot is good to go
-
-    //black returns 1, white returns 0
-    sensorValue1 = digitalRead(IR_PIN_1);  //left sensor (Outer)
-    sensorValue2 = digitalRead(IR_PIN_2);  //right sensor (Outer)
-    sensorValue3 = digitalRead(IR_PIN_3);  //left sensor (Inner)
-    sensorValue4 = digitalRead(IR_PIN_4);  //right sensor (Inner)
-
-    // Directions: (assume the IR sensors are on either side of the black tape)
-    if (sensorValue1 == 0 && sensorValue2 == 0 && sensorValue3 == 1 && sensorValue4 == 1) {
-      straight();
-    } else if (sensorValue1 == 0 && sensorValue3 == 0) {  //if inner and outer of left detects white, the robot will turn right
-      right();
-    } else if (sensorValue2 == 0 && sensorValue4 == 0) {  // Opposite to above explanation
-      left();
-    }
+    following();
   }else{ //
     stop();
   }
@@ -93,7 +79,21 @@ void loop() {
 
 
 void following(){
-  //
+  
+  //black returns 1, white returns 0
+  sensorValue1 = digitalRead(IR_PIN_1);  //left sensor (Outer)
+  sensorValue2 = digitalRead(IR_PIN_2);  //right sensor (Outer)
+  sensorValue3 = digitalRead(IR_PIN_3);  //left sensor (Inner)
+  sensorValue4 = digitalRead(IR_PIN_4);  //right sensor (Inner)
+
+  // Directions: (assume the IR sensors are on either side of the black tape)
+  if (sensorValue1 == 0 && sensorValue2 == 0 && sensorValue3 == 1 && sensorValue4 == 1) {
+    straight();
+  } else if (sensorValue1 == 0 && sensorValue3 == 0) {  //if inner and outer of left detects white, the robot will turn right
+    right();
+  } else if (sensorValue2 == 0 && sensorValue4 == 0) {  // Opposite to above explanation
+    left();
+  }
 }
 
 void straight() {
