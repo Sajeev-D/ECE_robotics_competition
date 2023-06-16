@@ -53,14 +53,13 @@ void loop() {
     lightSensor.start();
     int lux = lightSensor.getLux();
 
-
-
     // if light is shining on
     if(lux>3000){
       lightTurnedOn = 1;
     }
 
   }
+
 
 
   if(lightTurnedOn == 1){
@@ -84,6 +83,7 @@ void loop() {
       right();
     }
   }
+
 
 
 }
@@ -115,8 +115,8 @@ void right(){
     //note: left goes slow, right stays still
   LEFT_MOTOR_1->setSpeed(255);//less than 20% of max speed
   LEFT_MOTOR_2->setSpeed(255);//less than 20% of max speed
-  RIGHT_MOTOR_3->setSpeed(0);
-  RIGHT_MOTOR_4->setSpeed(0);
+  RIGHT_MOTOR_3->setSpeed(70); //
+  RIGHT_MOTOR_4->setSpeed(70);
 }
 
 void left(){
@@ -129,8 +129,8 @@ void left(){
 
   //Speed:
     //note: right goes slow, left stays still
-  LEFT_MOTOR_1->setSpeed(0);//less than 20% of max speed
-  LEFT_MOTOR_2->setSpeed(0);//less than 20% of max speed
+  LEFT_MOTOR_1->setSpeed(70);//less than 20% of max speed
+  LEFT_MOTOR_2->setSpeed(70);//less than 20% of max speed
   RIGHT_MOTOR_3->setSpeed(255);
   RIGHT_MOTOR_4->setSpeed(255);
 }
