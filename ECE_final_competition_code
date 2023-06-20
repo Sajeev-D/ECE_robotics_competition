@@ -18,14 +18,16 @@ Adafruit_DCMotor *FRONT_RIGHT_MOTOR = AFMS.getMotor(RIGHT_MOTOR_PIN_4);
 
 int left_outer_sensor;
 int left_inner_sensor;
-int centre_sensor;
+int right_inner_sensor;
 int right_outer_sensor;
-int MAX_SPEED = 100;  // All MAX_SPEEDS is changed to MAX_SPEED
+int MAX_SPEED = 255;  // All MAX_SPEEDS is changed to MAX_SPEED
 
 hp_BH1750 lightSensor;
 
 int lightTurnedOn = 0;
-int LUX_THRESHOLD = 3000;
+int lightStartTime = 0;
+int lightStopTime;
+int timeDiff;
 
 void setup() {
   //IR pins
@@ -76,8 +78,8 @@ void left() {  // Works
 
   //Speed:
   //note: right goes slow, left stays still
-  FRONT_LEFT_MOTOR->setSpeed(0);
-  BACK_LEFT_MOTOR->setSpeed(0);
+  FRONT_LEFT_MOTOR->setSpeed(20);
+  BACK_LEFT_MOTOR->setSpeed(20);
   BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED);
   FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED);
 }
@@ -106,8 +108,8 @@ void leftSharp() {  // Check motor directions
 
   // Speed:
   // Note: right goes slow, left stays still
-  FRONT_LEFT_MOTOR->setSpeed(MAX_SPEED / 2);
-  BACK_LEFT_MOTOR->setSpeed(MAX_SPEED / 2);
+  FRONT_LEFT_MOTOR->setSpeed((MAX_SPEED / 2) + 70);
+  BACK_LEFT_MOTOR->setSpeed((MAX_SPEED / 2) + 70);
   BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED);
   FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED);
 }
@@ -123,8 +125,8 @@ void rightSharp() {  // Check motor directions such that it turn on the spot, no
   //Speed:
   FRONT_LEFT_MOTOR->setSpeed(MAX_SPEED);
   BACK_LEFT_MOTOR->setSpeed(MAX_SPEED);
-  BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED / 2);
-  FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED / 2);
+  BACK_RIGHT_MOTOR->setSpeed((MAX_SPEED / 2) + 70);
+  FRONT_RIGHT_MOTOR->setSpeed((MAX_SPEED / 2) + 70);
 }
 
 void reverse() {
@@ -148,9 +150,9 @@ void T_intersection() {
   // Read the sensor values again
   int left_outer_sensor = digitalRead(IR_PIN_1);
   int left_inner_sensor = digitalRead(IR_PIN_2);
-  int centre_sensor = digitalRead(IR_PIN_3);
+  int right_inner_sensor = digitalRead(IR_PIN_3);
   int right_outer_sensor = digitalRead(IR_PIN_4);
-  if (left_outer_sensor == 0 && left_inner_sensor == 0 && centre_sensor == 0 && right_outer_sensor == 0) {
+  if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {
     rightSharp();
     rightSharp();
   }
@@ -163,10 +165,10 @@ void intersection() {
   // Read the sensor values again
   int left_outer_sensor = digitalRead(IR_PIN_1);
   int left_inner_sensor = digitalRead(IR_PIN_2);
-  int centre_sensor = digitalRead(IR_PIN_3);
+  int right_inner_sensor = digitalRead(IR_PIN_3);
   int right_outer_sensor = digitalRead(IR_PIN_4);
 
-  if (left_outer_sensor == 1 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 1) {
+  if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {
     reverse();
     delay(1999);
     T_intersection();
@@ -187,11 +189,24 @@ void stop() {
 void loop() {
   //light sensor (robot initialization step)
 
-  if (lux < 3000) { // To start robot
-    lightSensor.start();
-    int lux = lightSensor.getLux();
-    if (lux > 3000)
+  lightSensor.start();
+  int lux = lightSensor.getLux();
+
+  if (lux > 1000) {  // To start robot
+    lightStopTime = millis();
+    timeDiff = lightStopTime - lightStartTime;
+    if (lightTurnedOn == 0 && timeDiff > 2000) {
+      Serial.println("On");
       lightTurnedOn = 1;
+      lightStartTime = millis();
+    }
+
+    timeDiff = lightStopTime - lightStartTime;
+    if (lightTurnedOn == 1 && timeDiff > 2000) {
+      lightTurnedOn = 0;
+      Serial.println("off");
+      lightStartTime = millis();
+    }
   }
 
   if (lightTurnedOn == 1) {
@@ -200,28 +215,48 @@ void loop() {
 
     left_outer_sensor = digitalRead(IR_PIN_1);
     left_inner_sensor = digitalRead(IR_PIN_2);
-    centre_sensor = digitalRead(IR_PIN_3);
+    right_inner_sensor = digitalRead(IR_PIN_3);
     right_outer_sensor = digitalRead(IR_PIN_4);
 
     // Directions:
 
-    if (left_outer_sensor == 0 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 0) {  // straight
+    if (left_outer_sensor == 0 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 0) {  // straight
       straight();
-    } else if (left_outer_sensor == 0 && left_inner_sensor == 1 && centre_sensor == 0 && right_outer_sensor == 0) {  // curve
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // curve
       left();
-    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && centre_sensor == 1 && right_outer_sensor == 0) {  // curve
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 0) {  // curve
       right();
-    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 0) {  // 90 degree
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 0) {  // 90 degree
       leftSharp();
-    } else if (left_outer_sensor == 0 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 1) {  // 90 degree
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // 90 degree
       rightSharp();
-    } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && centre_sensor == 0 && right_outer_sensor == 1) {  // 2 way curved intersection
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // curve
+      rightSharp();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // curve
       leftSharp();
-    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 1) {  // Intersection & dashed line
-      intersection();
-    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && centre_sensor == 1 && right_outer_sensor == 1) {  // Intersection & dashed line
-      intersection();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // curve
+      straight();
     }
-  } else
+
+    // less important:
+    else if (left_outer_sensor == 0 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // Intersection & dashed line
+      straight();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // Intersection & dashed line
+      left();
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // Intersection & dashed line
+      right();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 0) {  // Intersection & dashed line
+      left();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // Intersection & dashed line
+      straight();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // Intersection & dashed line
+      straight();
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // Intersection & dashed line
+      straight();
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // 2 way curved intersection
+      straight();
+    }  // bottom
+  } else {
     stop();
+  }
 }
