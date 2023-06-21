@@ -78,8 +78,8 @@ void left() {  // Works
 
   //Speed:
   //note: right goes slow, left stays still
-  FRONT_LEFT_MOTOR->setSpeed(20);
-  BACK_LEFT_MOTOR->setSpeed(20);
+  FRONT_LEFT_MOTOR->setSpeed(13);
+  BACK_LEFT_MOTOR->setSpeed(13);
   BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED);
   FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED);
 }
@@ -95,8 +95,8 @@ void right() {
   //Speed:
   FRONT_LEFT_MOTOR->setSpeed(MAX_SPEED);
   BACK_LEFT_MOTOR->setSpeed(MAX_SPEED);
-  BACK_RIGHT_MOTOR->setSpeed(20);
-  FRONT_RIGHT_MOTOR->setSpeed(20);
+  BACK_RIGHT_MOTOR->setSpeed(13);
+  FRONT_RIGHT_MOTOR->setSpeed(13);
 }
 
 void leftSharp() {  // Check motor directions
@@ -129,51 +129,51 @@ void rightSharp() {  // Check motor directions such that it turn on the spot, no
   FRONT_RIGHT_MOTOR->setSpeed((MAX_SPEED / 2) + 70);
 }
 
-void reverse() {
-  //Directions:
-  FRONT_LEFT_MOTOR->run(FORWARD);
-  BACK_LEFT_MOTOR->run(BACKWARD);
-  //remember, left and right motors are set up in opposite directions
-  BACK_RIGHT_MOTOR->run(BACKWARD);
-  FRONT_RIGHT_MOTOR->run(FORWARD);
+// void reverse() {
+//   //Directions:
+//   FRONT_LEFT_MOTOR->run(FORWARD);
+//   BACK_LEFT_MOTOR->run(BACKWARD);
+//   //remember, left and right motors are set up in opposite directions
+//   BACK_RIGHT_MOTOR->run(BACKWARD);
+//   FRONT_RIGHT_MOTOR->run(FORWARD);
 
-  //Speed:
-  FRONT_LEFT_MOTOR->setSpeed(MAX_SPEED);
-  BACK_LEFT_MOTOR->setSpeed(MAX_SPEED);
-  BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED);
-  FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED);
-}
+//   //Speed:
+//   FRONT_LEFT_MOTOR->setSpeed(MAX_SPEED);
+//   BACK_LEFT_MOTOR->setSpeed(MAX_SPEED);
+//   BACK_RIGHT_MOTOR->setSpeed(MAX_SPEED);
+//   FRONT_RIGHT_MOTOR->setSpeed(MAX_SPEED);
+// }
 
-void T_intersection() {
+// void T_intersection() {
 
-  leftSharp();
-  // Read the sensor values again
-  int left_outer_sensor = digitalRead(IR_PIN_1);
-  int left_inner_sensor = digitalRead(IR_PIN_2);
-  int right_inner_sensor = digitalRead(IR_PIN_3);
-  int right_outer_sensor = digitalRead(IR_PIN_4);
-  if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {
-    rightSharp();
-    rightSharp();
-  }
-}
+//   leftSharp();
+//   // Read the sensor values again
+//   int left_outer_sensor = digitalRead(IR_PIN_1);
+//   int left_inner_sensor = digitalRead(IR_PIN_2);
+//   int right_inner_sensor = digitalRead(IR_PIN_3);
+//   int right_outer_sensor = digitalRead(IR_PIN_4);
+//   if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {
+//     rightSharp();
+//     rightSharp();
+//   }
+// }
 
-void intersection() {
-  straight();
-  delay(1999);
+// void intersection() {
+//   straight();
+//   delay(1999);
 
-  // Read the sensor values again
-  int left_outer_sensor = digitalRead(IR_PIN_1);
-  int left_inner_sensor = digitalRead(IR_PIN_2);
-  int right_inner_sensor = digitalRead(IR_PIN_3);
-  int right_outer_sensor = digitalRead(IR_PIN_4);
+//   // Read the sensor values again
+//   int left_outer_sensor = digitalRead(IR_PIN_1);
+//   int left_inner_sensor = digitalRead(IR_PIN_2);
+//   int right_inner_sensor = digitalRead(IR_PIN_3);
+//   int right_outer_sensor = digitalRead(IR_PIN_4);
 
-  if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {
-    reverse();
-    delay(1999);
-    T_intersection();
-  }
-}
+//   if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {
+//     reverse();
+//     delay(1999);
+//     T_intersection();
+//   }
+// }
 
 void stop() {
   FRONT_LEFT_MOTOR->setSpeed(0);
@@ -191,8 +191,9 @@ void loop() {
 
   lightSensor.start();
   int lux = lightSensor.getLux();
+  Serial.println(lux);
 
-  if (lux > 1000) {  // To start robot
+  if (lux > 800) {  // To start robot
     lightStopTime = millis();
     timeDiff = lightStopTime - lightStartTime;
     if (lightTurnedOn == 0 && timeDiff > 2000) {
@@ -208,6 +209,8 @@ void loop() {
       lightStartTime = millis();
     }
   }
+
+  //lightTurnedOn = 1;
 
   if (lightTurnedOn == 1) {
 
@@ -234,17 +237,18 @@ void loop() {
       rightSharp();
     } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // curve
       leftSharp();
-    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // curve
+    } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // Intersection
       straight();
+      //delay(700);
     }
 
     // less important:
     else if (left_outer_sensor == 0 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // Intersection & dashed line
       straight();
     } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 0) {  // Intersection & dashed line
-      left();
-    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 1) {  // Intersection & dashed line
-      right();
+      leftSharp();
+    } else if (left_outer_sensor == 0 && left_inner_sensor == 0 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // 2 way curved intersection
+      rightSharp();
     } else if (left_outer_sensor == 1 && left_inner_sensor == 0 && right_inner_sensor == 1 && right_outer_sensor == 0) {  // Intersection & dashed line
       left();
     } else if (left_outer_sensor == 1 && left_inner_sensor == 1 && right_inner_sensor == 0 && right_outer_sensor == 1) {  // Intersection & dashed line
